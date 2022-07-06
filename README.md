@@ -1,0 +1,1 @@
+Some pwsh scripts to initialize my dev environment on windows
