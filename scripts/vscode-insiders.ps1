@@ -1,22 +1,29 @@
-#Requires -RunAsAdministrator
-
 $ErrorActionPreference = 'Stop'
 
 Write-Host -ForegroundColor Cyan Install vscode-insiders...
 
-choco install vscode-insiders
-
-Write-Host -ForegroundColor Cyan Configure the environment variables
-. RefreshEnv.cmd
-$path = "$env:PATH"
-if ($path.Contains("VS Code Insiders")) {
-	Write-Host -ForegroundColor Yellow Environment path already set
-} else {
-	[System.Environment]::SetEnvironmentVariable('PATH', "$path;C:\Program Files\Microsoft VS Code Insiders\bin")
+if ($null -eq (scoop bucket list |Where-Object Name -eq "versions")) {
+	scoop bucket add versions
 }
 
-Write-Host -ForegroundColor Cyan  Set "codei" as the alias of "code-insiders"
-$folder = "C:\Program Files\Microsoft VS Code Insiders\bin" 
-New-Item -ItemType SymbolicLink -Path "$folder\codei.cmd" -Target "$folder\code-insiders.cmd" -ErrorAction SilentlyContinue
+scoop install vscode-insiders
+
+
+Write-Host -f Cyan "Associate file extensions..."
+reg "$env:USERPROFILE\scoop\apps\vscode-insiders\current\install-associations.reg"
+
+Write-Host -f Cyan "Install context command..."
+reg "$env:USERPROFILE\scoop\apps\vscode-insiders\current\install-context.reg"
+
+Write-Host -ForegroundColor Cyan  Set "ci" as the alias of "code-insiders"
+
+$ProfilePath = $PROFILE.CurrentUserAllHosts
+$AliasCommand = "New-Alias ci code-insiders"
+
+if (Test-Path "$ProfilePath") {
+	Add-Content "$ProfilePath" "$AliasCommand"
+} else {
+	New-Item -Path "$ProfilePath" -ItemType File -Value "$AliasCommand"
+}
 
 Write-Host -ForegroundColor Green Done

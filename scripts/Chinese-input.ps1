@@ -14,5 +14,4 @@ if (($UserLanguage | Where-Object LanguageTag -eq "$zhHansCN").Count -eq 0) {
 	Write-Host -ForegroundColor Yellow "Already added"
 }
 
-Write-Host -ForegroundColor Cyan "Adding MS Pinyin input method..."
 
